@@ -3,9 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gh-md-extract"
+name = "md-files-merge"
 version = "0.1.0"
-description = "Command line tool and library to extract Markdown files from GitHub repositories."
+description = "Command line tool and library to merge Markdown files in dirs and subdirs into one big markdown."
 readme = "README.md"
 authors = [{name = "Your Name"}]
 license = {text = "MIT"}
@@ -13,14 +13,4 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
-gh-md-extract = "gh_md_extract.cli:main"
-
-[project.optional-dependencies]
-test = [
-    "pytest",
-]
-
-[tool.pytest.ini_options]
-addopts = "-ra"
-pythonpath = ["."]
-
+md-merge-files = "md-merge-files.cli:main"
