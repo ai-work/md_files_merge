@@ -13,4 +13,4 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
-md-merge-files = "md-merge-files.cli:main"
+md-files-merge = "md_files_merge"
