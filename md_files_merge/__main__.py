@@ -30,16 +30,16 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=DEFAULT_HEADING_LEVEL,
         help=(
-            "Heading level (1-6) used to separate individual Markdown files in "
-            "the merged output."
+            "Deprecated. Retained for backwards compatibility and has no "
+            "effect on the output."
         ),
     )
     parser.add_argument(
         "--delimiter",
         default=DEFAULT_DELIMITER,
         help=(
-            "Delimiter that wraps each heading to keep it distinct from "
-            "existing content."
+            "Deprecated. Retained for backwards compatibility and has no "
+            "effect on the output."
         ),
     )
     return parser

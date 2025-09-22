@@ -32,7 +32,9 @@ def _collect_markdown_files(root: Path, output: Path | None = None) -> List[Mark
     -------
     list[tuple[pathlib.Path, pathlib.Path]]
         A list of tuples containing the absolute path to the Markdown file and
-        its path relative to ``root``.
+        its path relative to ``root``. Within each directory a ``README.md``
+        file (matched case-insensitively) is returned before any other Markdown
+        files.
     """
 
     markdown_files: List[MarkdownPathPair] = []
@@ -41,7 +43,8 @@ def _collect_markdown_files(root: Path, output: Path | None = None) -> List[Mark
     for directory, dirnames, filenames in os.walk(root):
         dirnames.sort()
         markdown_names = sorted(
-            name for name in filenames if name.lower().endswith(".md")
+            (name for name in filenames if name.lower().endswith(".md")),
+            key=lambda name: (name.lower() != "readme.md", name.lower()),
         )
         for name in markdown_names:
             file_path = Path(directory) / name
@@ -61,11 +64,11 @@ def merge_markdown_files(
 ) -> Path:
     """Merge Markdown files under ``root`` into a single document.
 
-    The Markdown files are discovered recursively in alphabetical order and the
-    content of each file is separated in the output by a heading that includes
-    the relative path of the original file. This function can be imported and
-    used programmatically as part of larger workflows or invoked through the
-    accompanying command line interface.
+    The Markdown files are discovered recursively in alphabetical order (with
+    ``README.md`` files given precedence within their directories) and their
+    raw contents are appended sequentially into the output file. This function
+    can be imported and used programmatically as part of larger workflows or
+    invoked through the accompanying command line interface.
 
     Parameters
     ----------
@@ -74,10 +77,11 @@ def merge_markdown_files(
     output:
         File path where the merged Markdown document will be written.
     heading_level:
-        Heading level to use for separating individual file contents.
+        Retained for backwards compatibility. Previously controlled the
+        heading level used between files but no longer has any effect.
     delimiter:
-        Unique delimiter used around each heading's path to avoid collisions
-        with existing headings in the source files.
+        Retained for backwards compatibility. Previously wrapped headings to
+        avoid collisions with existing content but no longer has any effect.
 
     Returns
     -------
@@ -99,18 +103,15 @@ def merge_markdown_files(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    heading_prefix = "#" * heading_level
-
     with output_path.open("w", encoding="utf-8") as merged_file:
-        for index, (file_path, relative_path) in enumerate(markdown_files):
+        for index, (file_path, _) in enumerate(markdown_files):
             if index:
                 merged_file.write("\n\n")
 
-            heading = f"{heading_prefix} {delimiter} {relative_path.as_posix()} {delimiter}"
-            merged_file.write(heading + "\n\n")
-
             content = file_path.read_text(encoding="utf-8")
             merged_file.write(content.rstrip("\n"))
+
+        if markdown_files:
             merged_file.write("\n")
 
     return output_path
